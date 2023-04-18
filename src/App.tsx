@@ -7,17 +7,18 @@ function App() {
   const [toBeDeletedEducation, setToBeDeletedEducation] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3001/past_career")
-      .then((r) => r.json())
-      .then((data) => {
-        setPastCareer(data.sort((a: object, b: object) => a.order - b.order));
-      });
+    const fetchData = async () => {
+      const [pastCareerData, educationData] = await Promise.all([
+        fetch("http://localhost:3001/past_career").then((r) => r.json()),
+        fetch("http://localhost:3001/education").then((r) => r.json()),
+      ]);
+      setPastCareer(
+        pastCareerData.sort((a: object, b: object) => a.order - b.order)
+      );
+      setEducation(educationData.sort((a, b) => a.order - b.order));
+    };
 
-    fetch("http://localhost:3001/education")
-      .then((r) => r.json())
-      .then((data) => {
-        setEducation(data.sort((a, b) => a.order - b.order));
-      });
+    fetchData();
   }, []);
 
   return (

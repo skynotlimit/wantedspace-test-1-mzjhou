@@ -15,7 +15,7 @@ module.exports = {
         SCDream9: ["SCDream9"],
       },
       colors: {
-        bgColor: "#F8F9FD",
+        "regal-blue": "#243c5a",
         textColor: "#424242",
         pointColor: "#0A65F2",
         modalImgTxt: "#A9C8FA",
