@@ -39,13 +39,13 @@ export type CaContract =
   | "FREELANCER_1";
 
 export interface PastCareer {
+  id: number;
   ca_title: string;
-  ca_content: string;
-  ca_rank: string;
-  ca_contract: CaContract;
   ca_start_date: string;
   ca_end_date: string;
-  ca_date_type: string;
+  ca_rank: string;
+  ca_contract: string;
+  ca_content: string;
   order: number;
 }
 

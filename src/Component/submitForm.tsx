@@ -5,7 +5,7 @@ import PastCareers from "./pastCareer";
 import { PastCareer, Education } from "../types";
 
 const SubmitForm = () => {
-  const [pastCareer, setPastCareer] = useState([]);
+  const [pastCareer, setPastCareer] = useState<PastCareer[]>([]);
   const [toBeDeletedPastCareer, setToBeDeletedPastCareer] = useState<
     Array<any>
   >([]);
@@ -86,6 +86,14 @@ const SubmitForm = () => {
     reset,
     formState: { errors },
   } = useForm<PastCareer>();
+
+  const handleMoveCareerItem = (from: number, to: number) => {
+    setPastCareer((p) => {
+      const moved = [...p];
+      moved.splice(to, 0, moved.splice(from, 1)[0]);
+      return moved;
+    });
+  };
 
   return (
     <div>
@@ -205,7 +213,7 @@ const SubmitForm = () => {
                     onChange={(e) => {
                       setPastCareer((p) => {
                         return p.map((prevItem) => {
-                          if (prevItem.id == item.id) {
+                          if (prevItem.id === item.id) {
                             return {
                               ...prevItem,
                               ca_contract: e.target.value,
@@ -255,38 +263,12 @@ const SubmitForm = () => {
                 >
                   <div>
                     <button
-                      onClick={() => {
-                        const next = [...pastCareer];
-                        const element = next.splice(index, 1)[0];
-                        next.splice(index - 1, 0, element);
-
-                        setPastCareer(
-                          next.map((item, index) => {
-                            return {
-                              ...item,
-                              order: index,
-                            };
-                          })
-                        );
-                      }}
+                      onClick={() => handleMoveCareerItem(index, index - 1)}
                     >
                       위로
                     </button>
                     <button
-                      onClick={() => {
-                        const next = [...pastCareer];
-                        const element = next.splice(index, 1)[0];
-                        next.splice(index + 1, 0, element);
-
-                        setPastCareer(
-                          next.map((item, index) => {
-                            return {
-                              ...item,
-                              order: index,
-                            };
-                          })
-                        );
-                      }}
+                      onClick={() => handleMoveCareerItem(index, index + 1)}
                     >
                       아래로
                     </button>
@@ -424,7 +406,7 @@ const SubmitForm = () => {
           </div>
         </div>
         <hr />
-        <button onClick={handleSubmit}>저장</button>
+        <button type="submit">저장</button>
       </form>
     </div>
   );
