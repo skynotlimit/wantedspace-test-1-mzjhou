@@ -1,42 +1,42 @@
 export type AptClass =
-  | 'team_name'
-  | 'team_leader_promote'
-  | 'team_leader_resign'
-  | 'team'
-  | 'position'
-  | 'rank'
-  | 'FIRST_JOINED'
-  | 'WORKING'
-  | 'ABSENCE'
-  | 'RETIRED'
-  | 'FULL_TIME_1'
-  | 'INTERN_1'
-  | 'IRREGULAR_1'
-  | 'NOT_ASSIGNED'
-  | 'PART_TIME_1';
+  | "team_name"
+  | "team_leader_promote"
+  | "team_leader_resign"
+  | "team"
+  | "position"
+  | "rank"
+  | "FIRST_JOINED"
+  | "WORKING"
+  | "ABSENCE"
+  | "RETIRED"
+  | "FULL_TIME_1"
+  | "INTERN_1"
+  | "IRREGULAR_1"
+  | "NOT_ASSIGNED"
+  | "PART_TIME_1";
 
 export type EduClass =
-  | 'GRADUATESCHOOL'
-  | 'UNIVERSITY'
-  | 'COLLEGE'
-  | 'HIGHSCHOOL';
+  | "GRADUATESCHOOL"
+  | "UNIVERSITY"
+  | "COLLEGE"
+  | "HIGHSCHOOL";
 
 export type EduDegree =
-  | 'GRADUATED'
-  | 'PHD'
-  | 'MASTER'
-  | 'BACHELOR'
-  | 'ATTENDING'
-  | 'EXCHANGE'
-  | 'LEAVE'
-  | 'ABSENCE';
+  | "GRADUATED"
+  | "PHD"
+  | "MASTER"
+  | "BACHELOR"
+  | "ATTENDING"
+  | "EXCHANGE"
+  | "LEAVE"
+  | "ABSENCE";
 
 export type CaContract =
-  | 'FULL_TIME_1'
-  | 'INTERN_1'
-  | 'IRREGULAR_1'
-  | 'PART_TIME_1'
-  | 'FREELANCER_1';
+  | "FULL_TIME_1"
+  | "INTERN_1"
+  | "IRREGULAR_1"
+  | "PART_TIME_1"
+  | "FREELANCER_1";
 
 export interface PastCareer {
   ca_title: string;

@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
-
+import DataFetcher from "../Apis/DataFetcher";
+import { useForm } from "react-hook-form";
 import PastCareers from "./pastCareer";
 import { PastCareer, Education } from "../types";
-interface educationData {
-  order: number;
-}
 
 const SubmitForm = () => {
-  const [pastCareer, setPastCareer] = useState<Array<any>>([]);
+  const [pastCareer, setPastCareer] = useState([]);
   const [toBeDeletedPastCareer, setToBeDeletedPastCareer] = useState<
     Array<any>
   >([]);
@@ -15,26 +13,23 @@ const SubmitForm = () => {
   const [toBeDeletedEducation, setToBeDeletedEducation] = useState<Array<any>>(
     []
   );
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<PastCareer>();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const [pastCareerData, educationData] = await Promise.all([
-        fetch("http://localhost:3001/past_career").then((r) => r.json()),
-        fetch("http://localhost:3001/education").then((r) => r.json()),
-      ]);
-      setPastCareer(
-        pastCareerData.sort((a: object, b: object) => a.order - b.order)
-      );
-      setEducation(educationData.sort((a, b) => a.order - b.order));
-    };
-
-    fetchData();
-  }, []);
+  const onSubmit = () => {};
 
   return (
     <div>
-      <div>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <h2>전 직장 경력</h2>
+        <DataFetcher
+          url="http://localhost:3001/past_career"
+          setter={setPastCareer}
+        />
         <div>
           {pastCareer.map((item, index) => {
             return (
@@ -62,20 +57,28 @@ const SubmitForm = () => {
                 </div>
                 <div>
                   <label>근무기간</label>
-
                   <input
                     type="date"
                     value={item.ca_start_date}
                     onChange={(e) => {
+                      const newStartDate = e.target.value;
                       setPastCareer((p) => {
                         return p.map((prevItem) => {
                           if (prevItem.id == item.id) {
-                            return {
-                              ...prevItem,
-                              ca_start_date: e.target.value,
-                            };
+                            const prevEndDate = prevItem.ca_end_date;
+                            if (prevEndDate && prevEndDate < newStartDate) {
+                              // 뒤에 날짜가 앞에 날짜보다 앞설 경우, 기존의 end_date와 같거나 큰 날짜로 설정합니다.
+                              return {
+                                ...prevItem,
+                                ca_start_date: prevEndDate,
+                              };
+                            } else {
+                              return {
+                                ...prevItem,
+                                ca_start_date: newStartDate,
+                              };
+                            }
                           }
-
                           return prevItem;
                         });
                       });
@@ -85,15 +88,24 @@ const SubmitForm = () => {
                     type="date"
                     value={item.ca_end_date}
                     onChange={(e) => {
+                      const newEndDate = e.target.value;
                       setPastCareer((p) => {
                         return p.map((prevItem) => {
                           if (prevItem.id == item.id) {
-                            return {
-                              ...prevItem,
-                              ca_end_date: e.target.value,
-                            };
+                            const prevStartDate = prevItem.ca_start_date;
+                            if (prevStartDate && prevStartDate > newEndDate) {
+                              // 앞에 날짜가 뒤에 날짜보다 앞설 경우, 기존의 start_date와 같거나 작은 날짜로 설정합니다.
+                              return {
+                                ...prevItem,
+                                ca_end_date: prevStartDate,
+                              };
+                            } else {
+                              return {
+                                ...prevItem,
+                                ca_end_date: newEndDate,
+                              };
+                            }
                           }
-
                           return prevItem;
                         });
                       });
@@ -324,7 +336,12 @@ const SubmitForm = () => {
         <hr />
 
         <h2>학력사항</h2>
+
         <div>
+          <DataFetcher
+            url="http://localhost:3001/education"
+            setter={setEducation}
+          />
           {education.map((item) => {
             return (
               <div key={item.id}>
@@ -407,7 +424,7 @@ const SubmitForm = () => {
             </button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 };
