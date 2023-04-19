@@ -51,11 +51,11 @@ export interface PastCareer {
 
 export interface Education {
   edu_title: string;
-  edu_class: EduClass;
+  edu_class: string;
   edu_major: string;
   edu_start_date: string;
   edu_end_date: string;
-  edu_degree: EduDegree;
+  edu_degree: string;
   order: number;
 }
 
