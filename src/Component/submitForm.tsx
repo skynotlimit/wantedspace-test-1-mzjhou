@@ -13,14 +13,79 @@ const SubmitForm = () => {
   const [toBeDeletedEducation, setToBeDeletedEducation] = useState<Array<any>>(
     []
   );
+
+  async function onSubmit() {
+    const deletePromises = toBeDeletedPastCareer.map((id) =>
+      fetch(`http://localhost:3001/past_career/${id}`, {
+        method: "DELETE",
+      })
+    );
+    await Promise.allSettled(deletePromises);
+
+    const postPromises = pastCareer
+      .filter((item) => item.draft)
+      .map((item) => {
+        const newItem = { ...item };
+        delete newItem.id;
+        delete newItem.draft;
+        return fetch("http://localhost:3001/past_career", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newItem),
+        });
+      });
+    const patchPromises = pastCareer
+      .filter((item) => !item.draft)
+      .map((item) =>
+        fetch(`http://localhost:3001/past_career/${item.id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          body: JSON.stringify(item),
+        })
+      );
+
+    const [postResults, patchResults] = await Promise.allSettled([
+      Promise.allSettled(postPromises),
+      Promise.allSettled(patchPromises),
+    ]);
+    if (
+      postResults.status === "fulfilled" &&
+      patchResults.status === "fulfilled"
+    ) {
+      const [postResponses, patchResponses] = [
+        postResults.value,
+        patchResults.value,
+      ];
+      const responsePromises = [
+        fetch("http://localhost:3001/past_career").then((r) => r.json()),
+        fetch("http://localhost:3001/education").then((r) => r.json()),
+      ];
+      const [pastCareerData, educationData] = await Promise.allSettled(
+        responsePromises
+      );
+      if (
+        pastCareerData.status === "fulfilled" &&
+        educationData.status === "fulfilled"
+      ) {
+        const [pastCareerResponse, educationResponse] = [
+          pastCareerData.value,
+          educationData.value,
+        ];
+        setPastCareer(pastCareerResponse.sort((a, b) => a.id - b.id));
+        setEducation(educationResponse.sort((a, b) => a.id - b.id));
+      }
+    }
+  }
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm<PastCareer>();
-
-  const onSubmit = () => {};
 
   return (
     <div>
@@ -236,72 +301,6 @@ const SubmitForm = () => {
                   >
                     삭제
                   </button>
-                  <div className="w-full h-fit flex flex-row justify-center items-center mt-7">
-                    <button
-                      onClick={async () => {
-                        await Promise.all(
-                          toBeDeletedPastCareer.map((id) => {
-                            return fetch(
-                              `http://localhost:3001/past_career/${id}`,
-                              {
-                                method: "DELETE",
-                              }
-                            );
-                          })
-                        );
-                        await Promise.all(
-                          pastCareer
-                            .filter((item) => item.draft)
-                            .map((item) => {
-                              delete item.id;
-                              delete item.draft;
-
-                              return fetch(
-                                "http://localhost:3001/past_career",
-                                {
-                                  method: "POST",
-                                  headers: {
-                                    "Content-Type": "application/json",
-                                  },
-                                  body: JSON.stringify(item),
-                                }
-                              );
-                            })
-                        );
-                        await Promise.all(
-                          pastCareer
-                            .filter((item) => !item.draft)
-                            .map((item) => {
-                              return fetch(
-                                `http://localhost:3001/past_career/${item.id}`,
-                                {
-                                  method: "PATCH",
-                                  headers: {
-                                    "Content-type":
-                                      "application/json; charset=UTF-8",
-                                  },
-                                  body: JSON.stringify(item),
-                                }
-                              );
-                            })
-                        );
-
-                        await fetch("http://localhost:3001/past_career")
-                          .then((r) => r.json())
-                          .then((data) => {
-                            setPastCareer(data.sort((a, b) => a.id - b.id));
-                          });
-
-                        await fetch("http://localhost:3001/education")
-                          .then((r) => r.json())
-                          .then((data) => {
-                            setEducation(data.sort((a, b) => a.id - b.id));
-                          });
-                      }}
-                    >
-                      저장
-                    </button>
-                  </div>
                 </div>
               </div>
             );
@@ -424,6 +423,8 @@ const SubmitForm = () => {
             </button>
           </div>
         </div>
+        <hr />
+        <button onClick={handleSubmit}>저장</button>
       </form>
     </div>
   );
